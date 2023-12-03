@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { Button } from "react-bootstrap";
+import { ToastContainer, toast } from "react-toastify";
 
 export default function TodoListFirst() {
-  const [todoValue, setTodoValue] = useState(
-    "Vui lòng nhập một công việc...!!!"
-  );
+  const [todoValue, setTodoValue] = useState("");
   const [jobs, setJobs] = useState([]);
 
   const handleOnChange = (text) => {
@@ -12,18 +11,34 @@ export default function TodoListFirst() {
   };
 
   const handleOnClick = () => {
-    setJobs((prev) => {
-      return [...prev, todoValue];
-    });
+    if (todoValue) {
+      const isDuplicate = jobs.some((itemp) => itemp === todoValue);
+      if (isDuplicate) {
+        toast.error("Bạn đã thêm trùng...!!!");
+      } else {
+        setJobs((prev) => {
+          return [...prev, todoValue];
+        });
+        setTodoValue("");
+        toast.success("Bạn đã thêm thành công...!!!");
+      }
+    } else {
+      toast.error("Bạn vui lòng đừng bỏ trống...!!!", todoValue);
+    }
   };
 
   const handleDelete = (index) => {
-   setJobs((prev)=>{
-    const jobArray =[...prev]
-    jobArray.splice(index,1)
-    return jobArray
-   })
+    setJobs((prev) => {
+      const jobArray = [...prev];
+      jobArray.splice(index, 1);
+      toast.error("Bạn đã xóa thành công", {
+        icon: false,
+        theme: "colored",
+      });
+      return jobArray;
+    });
   };
+
   return (
     <div className="container mt-3">
       <div className=" d-flex gap-3">
@@ -43,7 +58,7 @@ export default function TodoListFirst() {
             <span className="border border-danger w-100 p-1"> {job}</span>
 
             <div className="d-flex gap-2">
-              <Button variant="danger" onClick={()=> handleDelete(index)}>
+              <Button variant="danger" onClick={() => handleDelete(index)}>
                 Delete
               </Button>
               <Button variant="warning">Update</Button>
@@ -51,6 +66,7 @@ export default function TodoListFirst() {
           </li>
         ))}
       </ul>
+      <ToastContainer autoClose={1500} />
     </div>
   );
 }
